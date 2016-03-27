@@ -17,6 +17,7 @@ use SMWDataItem as DataItem;
 use SMWDataItemHandler as DataItemHandler;
 use SMWSql3SmwIds;
 use SMWSQLStore3Table;
+use SMW\SQLStore\QueryEngine\FulltextSearchTableFactory;
 
 /**
  * @license GNU GPL v2+
@@ -39,6 +40,11 @@ class SomePropertyInterpreter implements DescriptionInterpreter {
 	private $comparatorMapper;
 
 	/**
+	 * @var FulltextSearchTableFactory
+	 */
+	private $fulltextSearchTableFactory;
+
+	/**
 	 * @since 2.2
 	 *
 	 * @param QuerySegmentListBuilder $querySegmentListBuilder
@@ -46,6 +52,7 @@ class SomePropertyInterpreter implements DescriptionInterpreter {
 	public function __construct( QuerySegmentListBuilder $querySegmentListBuilder ) {
 		$this->querySegmentListBuilder = $querySegmentListBuilder;
 		$this->comparatorMapper = new ComparatorMapper();
+		$this->fulltextSearchTableFactory = new FulltextSearchTableFactory();
 	}
 
 	/**
@@ -250,14 +257,18 @@ class SomePropertyInterpreter implements DescriptionInterpreter {
 		$dataItem = $description->getDataItem();
 		$db = $this->querySegmentListBuilder->getStore()->getConnection( 'mw.db' );
 
+		$valueMatchConditionBuilder = $this->fulltextSearchTableFactory->newValueMatchConditionBuilderByType(
+			$this->querySegmentListBuilder->getStore()
+		);
+
 		// TODO Better get the handle from the property type
 		// Some comparators (e.g. LIKE) could use DI values of
 		// a different type; we care about the property table, not
 		// about the value
 
 		// Do not support smw_id joined data for now.
-
 		$indexField = $diHandler->getIndexField();
+
 		//Hack to get to the field used as index
 		$keys = $diHandler->getWhereConds( $dataItem );
 		$value = $keys[$indexField];
@@ -274,7 +285,11 @@ class SomePropertyInterpreter implements DescriptionInterpreter {
 			);
 		}
 
-		if ( $where == '' ) {
+		if ( $where == '' && $valueMatchConditionBuilder->hasFulltextSearchSupport( $description ) ) {
+			$query->joinTable = $valueMatchConditionBuilder->getTableName();
+			$query->components = array();
+			$where = $valueMatchConditionBuilder->getWhereCondition( $description, $query->alias );
+		} elseif ( $where == '' ) {
 
 			$comparator = $this->comparatorMapper->mapComparator(
 				$description,

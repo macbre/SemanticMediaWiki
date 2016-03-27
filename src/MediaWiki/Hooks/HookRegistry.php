@@ -9,6 +9,7 @@ use SMW\ApplicationFactory;
 use SMW\EventHandler;
 use SMW\NamespaceManager;
 use SMW\SQLStore\QueryDependencyLinksStoreFactory;
+use SMW\SQLStore\QueryEngine\FulltextSearchTableFactory;
 use SMW\DeferredRequestDispatchManager;
 use SMW\PropertyHierarchyLookup;
 use Onoi\HttpRequest\HttpRequestFactory;
@@ -519,6 +520,16 @@ class HookRegistry {
 				'SMW\ParserCachePurgeJob',
 				$semanticData->getSubject()->getTitle(),
 				$jobParameters
+			);
+
+			$fulltextSearchTableFactory = new FulltextSearchTableFactory();
+
+			$fulltextSearchTableUpdater = $fulltextSearchTableFactory->newFulltextSearchTableUpdater(
+				$store
+			);
+
+			$fulltextSearchTableUpdater->addUpdatesFromPropertyTableDiff(
+				$compositePropertyTableDiffIterator
 			);
 
 			return true;

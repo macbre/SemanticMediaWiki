@@ -68,6 +68,11 @@ class SMWSQLStore3 extends SMWStore {
 	const QUERY_LINKS_TABLE = 'smw_query_links';
 
 	/**
+	 * Name of the table that manages ...
+	 */
+	const FT_SEARCH_TABLE = 'smw_ft_search';
+
+	/**
 	 * Name of the table that manages the Store IDs
 	 */
 	const ID_TABLE = 'smw_object_ids';

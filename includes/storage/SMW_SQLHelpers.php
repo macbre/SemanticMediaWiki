@@ -100,15 +100,35 @@ class SMWSQLHelpers {
 			$fieldSql[] = "$fieldName  $fieldType";
 		}
 
-		$sql = 'CREATE TABLE ' . ( ( $wgDBtype == 'postgres' || $wgDBtype == 'sqlite' ) ? '' : "`$wgDBname`." ) . $tableName . ' (';
+		// SQLite Fulltext
+		if (
+			$wgDBtype === 'sqlite' &&
+			isset( $tableOptions['sqlite'] ) &&
+			strpos( $tableOptions['sqlite'], 'FTS' ) !== false ) {
 
-		$tableOptions = isset( $tableOptions[$wgDBtype] ) ? $tableOptions[$wgDBtype] : $GLOBALS['wgDBTableOptions'];
+			$mode = $tableOptions['sqlite'];
+			$options = '';
 
-		$sql .= implode( ',', $fieldSql ) . ') ';
+			// Filter extra module options
+			// @see https://www.sqlite.org/fts3.html#fts4_options
+			if ( strpos( $mode, ',' ) !== false ) {
+				list( $mode, $options ) = explode( ',', $mode, 2 );
+				$options = ',' . $options;
+			}
 
-		if ( $wgDBtype != 'postgres' && $wgDBtype != 'sqlite' ) {
-			// This replacement is needed for compatibility, see http://bugs.mysql.com/bug.php?id=17501
-			$sql .= str_replace( 'TYPE', 'ENGINE', $tableOptions );
+			$sql = 'CREATE VIRTUAL TABLE ' . $tableName . ' USING ' . strtolower( $mode ) .'(' . implode( ',', $fieldSql ) . $options . ') ';
+		} else {
+
+			$sql = 'CREATE TABLE ' . ( ( $wgDBtype == 'postgres' || $wgDBtype == 'sqlite' ) ? '' : "`$wgDBname`." ) . $tableName . ' (';
+
+			$tableOptions = isset( $tableOptions[$wgDBtype] ) ? $tableOptions[$wgDBtype] : $GLOBALS['wgDBTableOptions'];
+
+			$sql .= implode( ',', $fieldSql ) . ') ';
+
+			if ( $wgDBtype != 'postgres' && $wgDBtype != 'sqlite' ) {
+				// This replacement is needed for compatibility, see http://bugs.mysql.com/bug.php?id=17501
+				$sql .= str_replace( 'TYPE', 'ENGINE', $tableOptions );
+			}
 		}
 
 		$db->query( $sql, __METHOD__ );
@@ -131,6 +151,18 @@ class SMWSQLHelpers {
 
 		if ( !$isPostgres ) {
 			$position = 'FIRST';
+		}
+
+		// Fulltext virtual tables in SQLite are special therefore drop and recreate them
+		if (
+			$wgDBtype === 'sqlite' &&
+			isset( $tableOptions['sqlite'] ) &&
+			strpos( $tableOptions['sqlite'], 'FTS' ) !== false ) {
+			self::reportProgress( "   ... drop $tableName ... \n", $reportTo );
+			$db->query( 'DROP TABLE ' . $tableName , __METHOD__ );
+			self::reportProgress( "   ... recreate $tableName ... \n", $reportTo );
+			self::createTable( $tableName, $fields, $tableOptions, $db );
+			return null;
 		}
 
 		// Loop through all the field definitions, and handle each definition for either postgres or MySQL.
@@ -514,12 +546,19 @@ EOT;
 			if (  $wgDBtype == 'mysql' ) {
 				$db->query( "ALTER TABLE $tableName ADD $type $columns ($columns)", __METHOD__ );
 			}
+
+			// SQLite uses fixed predefined indexes to manage FT support
+
 		} elseif ( $wgDBtype == 'postgres' ) { // postgresql
 			if ( $db->indexInfo( $tableName, $indexName ) === false ) {
 				$db->query( "CREATE $type $indexName ON $tableName ($columns)", __METHOD__ );
 			}
 		} elseif ( $wgDBtype == 'sqlite' ) { // SQLite
-			$db->query( "CREATE $type $indexName ON $tableName ($columns)", __METHOD__ );
+			if ( strpos( $tableName, 'ft_search' ) !== false ) {
+				self::reportProgress( "    ... SQLite fulltext does not support a separate index on columns ... ", $reportTo );
+			} else {
+				$db->query( "CREATE $type $indexName ON $tableName ($columns)", __METHOD__ );
+			}
 		} else { // MySQL and default
 			$db->query( "ALTER TABLE $tableName ADD $type ($columns)", __METHOD__ );
 		}

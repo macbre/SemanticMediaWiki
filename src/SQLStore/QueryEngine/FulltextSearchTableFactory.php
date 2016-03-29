@@ -5,6 +5,7 @@ namespace SMW\SQLStore\QueryEngine;
 use SMW\SQLStore\SQLStore;
 use SMW\SQLStore\QueryEngine\Fulltext\ValueMatchConditionBuilder;
 use SMW\SQLStore\QueryEngine\Fulltext\MySQLValueMatchConditionBuilder;
+use SMW\SQLStore\QueryEngine\Fulltext\SQLiteValueMatchConditionBuilder;
 use SMW\SQLStore\QueryEngine\Fulltext\GenericFulltextSearchTableUpdater;
 
 /**
@@ -29,6 +30,11 @@ class FulltextSearchTableFactory {
 		switch ( $type ) {
 			case 'mysql':
 				return new MySQLValueMatchConditionBuilder(
+					$this->newGenericFulltextSearchTableUpdater( $store )
+				);
+				break;
+			case 'sqlite':
+				return new SQLiteValueMatchConditionBuilder(
 					$this->newGenericFulltextSearchTableUpdater( $store )
 				);
 				break;

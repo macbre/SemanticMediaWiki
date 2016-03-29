@@ -971,6 +971,7 @@ $GLOBALS['smwgDVFeatures'] = SMW_DV_PROV_REDI | SMW_DV_MLTV_LCODE | SMW_DV_PVAP 
 # for the DB back-end to apply special fulltext index operations.
 #
 # - Tested with MySQL/MariaDB
+# - Tested with SQLite
 #
 # @since 2.4
 ##
@@ -982,10 +983,26 @@ $GLOBALS['smwgEnabledFulltextSearch'] = false;
 # Please change these settings carefully as they directly influence how a ft
 # table is created.
 #
+# - MySQL version 5.6 or later with only MyISAM and InnoDB storage engines
+# to support full-text search (according to sources)
+#
+# - MariaDB full-text indexes can be used only with MyISAM and Aria tables,
+# from MariaDB 10.0.5 with InnoDB tables and from MariaDB 10.0.15
+# with Mroonga tables (according to sources)
+#
+# - SQLite FTS3 has been available since version 3.5, FTS4 were added with
+# version 3.7.4, and FTS5 is available with version 3.9.0 (according to
+# sources); The setting allows to specify extra arguments after the module
+# engine such as 'FTS4, tokenize=porter'.
+#
+# Any change in the settings requires to run the `rebuildFulltextSearchTable.php`
+# script.
+#
 # @since 2.4
 ##
 $GLOBALS['smwgFulltextSearchTableOptions'] = array(
-	'mysql' => 'ENGINE=MyISAM, DEFAULT CHARSET=utf8'
+	'mysql'  => 'ENGINE=MyISAM, DEFAULT CHARSET=utf8',
+	'sqlite' => 'FTS4'
 );
 
 ##

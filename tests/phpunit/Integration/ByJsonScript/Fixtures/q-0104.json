@@ -148,6 +148,9 @@
 		},
 		{
 			"about": "#8 free search",
+			"skip-on": {
+				"sqlite": "works different in comparison to MySQL, see #9"
+			},
 			"condition": "[[~with a category&SEARCH]]",
 			"printouts" : [],
 			"parameters" : {
@@ -163,6 +166,21 @@
 		},
 		{
 			"about": "#9 free search",
+			"condition": "[[~with* a category&SEARCH]]",
+			"printouts" : [],
+			"parameters" : {
+				"limit" : "10"
+			},
+			"queryresult": {
+				"count": 2,
+				"results": [
+					"Example/Q0104/4#0##_5a524a435267f6e6d2d45d64a419c1da",
+					"Example/Q0104/4#0##_d4fe48d7241e6530c628f32168815beb"
+				]
+			}
+		},
+		{
+			"about": "#10 free search",
 			"condition": "[[~with a category&SEARCH]] [[Category:Q0104]]",
 			"printouts" : [],
 			"parameters" : {
@@ -182,7 +200,6 @@
 	"meta": {
 		"skip-on": {
 			"postgres": "Not supported by PostgreSQL.",
-			"sqlite": "Not supported by SQLite.",
 			"sesame": "Not supported by SPARQLStore (Sesame).",
 			"virtuoso": "Not supported by SPARQLStore (Virtuoso).",
 			"fuseki": "Not supported by SPARQLStore (Fuskei).",

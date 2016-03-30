@@ -146,6 +146,32 @@ class SMWSQLStore3SetupHandlers implements MessageReporter {
 			$db
 		);
 
+		// TEXT and BLOB is stored off the table with the table just having a pointer
+		// VARCHAR is stored inline with the table
+		SMWSQLHelpers::setupTable(
+			SMWSQLStore3::FT_SEARCH_TABLE,
+			array(
+				's_id' => $dbtypes['p'] . ' NOT NULL',
+				'p_id' => $dbtypes['p'] . ' NOT NULL',
+				'o_text' => 'TEXT',
+				'o_hash' => $dbtypes['t'],
+			),
+			$db,
+			$reportTo,
+			$GLOBALS['smwgFulltextSearchTableOptions']
+		);
+
+		SMWSQLHelpers::setupIndex(
+			SMWSQLStore3::FT_SEARCH_TABLE,
+			array(
+				's_id',
+				'p_id',
+				'o_hash',
+				array( 'o_text', 'FULLTEXT' )
+			),
+			$db
+		);
+
 		// Set up table for stats on Properties (only counts for now)
 		SMWSQLHelpers::setupTable(
 			SMWSQLStore3::PROPERTY_STATISTICS_TABLE,

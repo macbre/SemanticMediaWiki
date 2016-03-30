@@ -963,3 +963,45 @@ $GLOBALS['smwgEnabledInTextAnnotationParserStrictMode'] = true;
 # @since 2.4
 ##
 $GLOBALS['smwgDVFeatures'] = SMW_DV_PROV_REDI | SMW_DV_MLTV_LCODE | SMW_DV_PVAP | SMW_DV_WPV_DTITLE;
+
+##
+# Enable fulltext search support
+#
+# If enabled, it will store text elements using a separate table in order for the
+# DB back-end to apply special fulltext index operations.
+#
+# - Tested with MySQL/MariaDB
+#
+# @since 2.4
+##
+$GLOBALS['smwgEnabledFulltextSearch'] = false;
+
+##
+# Fulltext search table options
+#
+# This setting directly influences how a ft table is created therefore please
+# change the content with caution.
+#
+# - MySQL version 5.6 or later with only MyISAM and InnoDB storage engines
+# to support full-text search (according to sources)
+#
+# - MariaDB full-text indexes can be used only with MyISAM and Aria tables,
+# from MariaDB 10.0.5 with InnoDB tables and from MariaDB 10.0.15
+# with Mroonga tables (according to sources)
+#
+# @since 2.4
+##
+$GLOBALS['smwgFulltextSearchTableOptions'] = array(
+	'mysql' => 'ENGINE=MyISAM, DEFAULT CHARSET=utf8'
+);
+
+##
+# Describes the minimum word/token length to help to decide whether MATCH or LIKE
+# operators are be used for a condition statement.
+#
+# For MySQL it is expected to correspond to either innodb_ft_min_token_size or
+# ft_min_word_len
+#
+# @since 2.4
+##
+$GLOBALS['smwgFulltextSearchMinTokenSize'] = 3;

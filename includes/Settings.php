@@ -142,7 +142,10 @@ class Settings extends SimpleDictionary {
 			'smwgExportBCAuxiliaryUse' => $GLOBALS['smwgExportBCAuxiliaryUse'],
 			'smwgEnabledInTextAnnotationParserStrictMode' => $GLOBALS['smwgEnabledInTextAnnotationParserStrictMode'],
 			'smwgSparqlRepositoryConnectorForcedHttpVersion' => $GLOBALS['smwgSparqlRepositoryConnectorForcedHttpVersion'],
-			'smwgDVFeatures' => $GLOBALS['smwgDVFeatures']
+			'smwgDVFeatures' => $GLOBALS['smwgDVFeatures'],
+			'smwgEnabledFulltextSearch' => $GLOBALS['smwgEnabledFulltextSearch'],
+			'smwgFulltextSearchTableOptions' => $GLOBALS['smwgFulltextSearchTableOptions'],
+			'smwgFulltextSearchMinTokenSize' => $GLOBALS['smwgFulltextSearchMinTokenSize']
 		);
 
 		$settings = $settings + array(

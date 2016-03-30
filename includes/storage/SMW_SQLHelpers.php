@@ -68,18 +68,18 @@ class SMWSQLHelpers {
 	 * @param DatabaseBase or Database $db
 	 * @param object $reportTo Object to report back to.
 	 */
-	public static function setupTable( $rawTableName, array $fields, $db, $reportTo = null ) {
+	public static function setupTable( $rawTableName, array $fields, $db, $reportTo = null, $tableOptions = array() ) {
 		$tableName = $db->tableName( $rawTableName );
 
 		self::reportProgress( "Checking table $tableName ...\n", $reportTo );
 
 		if ( $db->tableExists( $rawTableName ) === false ) { // create new table
 			self::reportProgress( "   Table not found, now creating...\n", $reportTo );
-			self::createTable( $tableName, $fields, $db );
+			self::createTable( $tableName, $fields, $tableOptions, $db );
 			self::reportProgress( "   ... done.\n", $reportTo );
 		} else {
 			self::reportProgress( "   Table already exists, checking structure ...\n", $reportTo );
-			self::updateTable( $tableName, $fields, $db, $reportTo );
+			self::updateTable( $tableName, $fields, $tableOptions, $db, $reportTo );
 			self::reportProgress( "   ... done.\n", $reportTo );
 		}
 	}
@@ -91,10 +91,8 @@ class SMWSQLHelpers {
 	 * @param array $columns The fields and their types the table should have.
 	 * @param DatabaseBase|Database $db
 	 */
-	private static function createTable( $tableName, array $fields, $db ) {
+	private static function createTable( $tableName, array $fields, $tableOptions = array(), $db ) {
 		global $wgDBtype, $wgDBname;
-
-		$sql = 'CREATE TABLE ' . ( ( $wgDBtype == 'postgres' || $wgDBtype == 'sqlite' ) ? '' : "`$wgDBname`." ) . $tableName . ' (';
 
 		$fieldSql = array();
 
@@ -102,11 +100,15 @@ class SMWSQLHelpers {
 			$fieldSql[] = "$fieldName  $fieldType";
 		}
 
+		$sql = 'CREATE TABLE ' . ( ( $wgDBtype == 'postgres' || $wgDBtype == 'sqlite' ) ? '' : "`$wgDBname`." ) . $tableName . ' (';
+
+		$tableOptions = isset( $tableOptions[$wgDBtype] ) ? $tableOptions[$wgDBtype] : $GLOBALS['wgDBTableOptions'];
+
 		$sql .= implode( ',', $fieldSql ) . ') ';
 
 		if ( $wgDBtype != 'postgres' && $wgDBtype != 'sqlite' ) {
 			// This replacement is needed for compatibility, see http://bugs.mysql.com/bug.php?id=17501
-			$sql .= str_replace( 'TYPE', 'ENGINE', $GLOBALS['wgDBTableOptions'] );
+			$sql .= str_replace( 'TYPE', 'ENGINE', $tableOptions );
 		}
 
 		$db->query( $sql, __METHOD__ );
@@ -120,7 +122,7 @@ class SMWSQLHelpers {
 	 * @param DatabaseBase|Database $db
 	 * @param object $reportTo Object to report back to.
 	 */
-	private static function updateTable( $tableName, array $fields, $db, $reportTo ) {
+	private static function updateTable( $tableName, array $fields, $tableOptions = array(), $db, $reportTo ) {
 		global $wgDBtype;
 
 		$currentFields = self::getFields( $tableName, $db, $reportTo );
@@ -505,7 +507,14 @@ EOT;
 		global $wgDBtype;
 
 		self::reportProgress( "   ... creating new index $columns ...", $reportTo );
-		if ( $wgDBtype == 'postgres' ) { // postgresql
+
+		// Fulltext index
+		if ( $type === 'FULLTEXT' ) {
+			 // MySQL
+			if (  $wgDBtype == 'mysql' ) {
+				$db->query( "ALTER TABLE $tableName ADD $type $columns ($columns)", __METHOD__ );
+			}
+		} elseif ( $wgDBtype == 'postgres' ) { // postgresql
 			if ( $db->indexInfo( $tableName, $indexName ) === false ) {
 				$db->query( "CREATE $type $indexName ON $tableName ($columns)", __METHOD__ );
 			}
@@ -514,6 +523,7 @@ EOT;
 		} else { // MySQL and default
 			$db->query( "ALTER TABLE $tableName ADD $type ($columns)", __METHOD__ );
 		}
+
 		self::reportProgress( "done.\n", $reportTo );
 	}
 

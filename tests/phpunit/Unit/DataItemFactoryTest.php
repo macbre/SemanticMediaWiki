@@ -3,6 +3,7 @@
 namespace SMW\Tests;
 
 use SMW\DataItemFactory;
+use SMWDIUri as DIUri;
 
 /**
  * @covers \SMW\DataItemFactory
@@ -94,6 +95,16 @@ class DataItemFactoryTest extends \PHPUnit_Framework_TestCase {
 		$this->assertInstanceOf(
 			'\SMWDIBoolean',
 			$instance->newDIBoolean( true )
+		);
+	}
+
+	public function testCanConstructDIUri() {
+
+		$instance = new DataItemFactory();
+
+		$this->assertInstanceOf(
+			DIUri::class,
+			$instance->newDIUri( 'http', 'example.org' )
 		);
 	}
 

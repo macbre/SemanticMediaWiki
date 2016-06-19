@@ -106,6 +106,16 @@ class DataValueFactory {
 			$dataTypeRegistry->getOptions()
 		);
 
+		$dataValue->setOption(
+			DataValue::OPT_USER_LANGUAGE,
+			Localizer::getInstance()->getUserLanguage()->getCode()
+		);
+
+		$dataValue->setOption(
+			DataValue::OPT_CONTENT_LANGUAGE,
+			Localizer::getInstance()->getContentLanguage()->getCode()
+		);
+
 		if ( $property !== null ) {
 			$dataValue->setProperty( $property );
 		}
@@ -113,11 +123,6 @@ class DataValueFactory {
 		if ( !is_null( $contextPage ) ) {
 			$dataValue->setContextPage( $contextPage );
 		}
-
-		$dataValue->setOption(
-			DataValue::OPT_USER_LANGUAGE,
-			Localizer::getInstance()->getUserLanguage()->getCode()
-		);
 
 		if ( $valueString !== false ) {
 			$dataValue->setUserValue( $valueString, $caption );

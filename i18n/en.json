@@ -404,5 +404,13 @@
 	"smw-pa-property-predefined_num": "\"$1\" is a [[Special:Types/Number|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent numeric values.",
 	"smw-pa-property-predefined_dat": "\"$1\" is a [[Special:Types/Date|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent date values.",
 	"smw-pa-property-predefined_uri": "\"$1\" is a [[Special:Types/URL|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent URI/URL values.",
-	"smw-pa-property-predefined_qty": "\"$1\" is a [[Special:Types/Quantity|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent quantity values."
+	"smw-pa-property-predefined_qty": "\"$1\" is a [[Special:Types/Quantity|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent quantity values.",
+	"smw-datavalue-external-formatter-uri-missing-placeholder": "Formatter uri is missing the ''$1'' placeholder.",
+	"smw-datavalue-external-formatter-invalid-uri": " \"$1\" is an invalid URL.",
+	"smw-datavalue-external-identifier-formatter-missing": "The property is missing an [[Property:External formatter uri|\"External formatter uri\"]] assignment.",
+	"smw-pa-property-predefined_eid": "\"$1\" is a [[Special:Types/External identifier|type]] and predefined property provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki] to represent external identifiers.",
+	"smw-pa-property-predefined_peid": "\"$1\" is a predefined property that specifies an external identifier and is provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki].",
+	"smw-pa-property-predefined_pefu": "\"$1\" is a predefined property that specifies a URI and is provided by [https://www.semantic-mediawiki.org/wiki/Help:Special_properties Semantic MediaWiki].",
+	"smw-pa-property-predefined-long_pefu": "The URI is expected to contain a placeholder so that external identifiers can be formatted and positioned correctly.",
+	"smw-sp-types_eid": "\"$1\" is a restricted [https://www.semantic-mediawiki.org/wiki/Type_String String] type that requires assigned properties to declare an [[Property:External formatter uri|External formatter uri]]."
 }

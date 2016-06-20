@@ -24,6 +24,32 @@ class QueryProfileAnnotatorFactoryTest extends \PHPUnit_Framework_TestCase {
 		);
 	}
 
+	public function testConstructDescriptionProfileAnnotator() {
+
+		$description = $this->getMockBuilder( '\SMW\Query\Language\Description' )
+			->disableOriginalConstructor()
+			->getMock();
+
+		$query = $this->getMockBuilder( '\SMWQuery' )
+			->disableOriginalConstructor()
+			->getMock();
+
+		$query->expects( $this->atLeastOnce() )
+			->method( 'getContextPage' )
+			->will( $this->returnValue( DIWikiPage::newFromText( __METHOD__ ) ) );
+
+		$query->expects( $this->once() )
+			->method( 'getDescription' )
+			->will( $this->returnValue( $description ) );
+
+		$instance = new QueryProfileAnnotatorFactory();
+
+		$this->assertInstanceOf(
+			'\SMW\Query\ProfileAnnotator\DescriptionProfileAnnotator',
+			$instance->newDescriptionProfileAnnotator( $query )
+		);
+	}
+
 	public function testConstructJointProfileAnnotator() {
 
 		$description = $this->getMockBuilder( '\SMW\Query\Language\Description' )
